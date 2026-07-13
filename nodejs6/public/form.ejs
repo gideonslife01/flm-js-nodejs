@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>FETCH FORM</title>
+    <style>
+        .signup-form {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: calc(100% - 80px); /* Adjust width to accommodate the button */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .input-button-wrapper {
+            display: flex;
+            gap: 10px; /* Space between input and button */
+            align-items: center;
+        }
+        button { /* submit 타입 제거 / Remove the submit type. */
+            background-color: #ff8787;
+            color: white;
+            padding: 15px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            box-sizing: border-box;
+            white-space: nowrap; /* 줄바꿈금지 / No line breaks*/
+        }
+        button:hover {
+            background-color: #ff6b6b;
+        }
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .available-message {
+            color: green;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-form">
+        <form id="signupForm" name="signupForm">
+            <div class="form-group">
+                <label for="username">아이디/ID:</label>
+                <div class="input-button-wrapper">
+                    <input type="text" id="username" name="username" required minlength="3" maxlength="50" />
+                    <button type="button" id="submitBtn">확인 submit</button>
+                </div>
+                <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="available-message"></div>
+            </div>
+        </form>
+    </div>
+    <script>
+        // id값 가져오기
+        // Get the ID value
+        const signupForm = document.getElementById('signupForm');
+        const usernameInput = document.getElementById('username');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMessageDiv = document.getElementById('errorMessage');
+        const successMessageDiv = document.getElementById('successMessage');
+
+        // click이벤트 
+        // click event
+        submitBtn.addEventListener('click', async (event) => {
+            errorMessageDiv.textContent = '';
+            successMessageDiv.textContent = '';
+            try {
+                const formData = new FormData(signupForm);
+                const data = {};
+                formData.forEach((value, key) => (data[key] = value));
+                
+                // fetch방식
+                // fetch method
+                const response = await fetch('/signupProc', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                // 서버에서json데이터 받기
+                // Receive JSON data from the server
+                const result = await response.json();
+
+                if (response.ok) {
+                    successMessageDiv.textContent = result.message || '회원가입이 완료되었습니다.\nSignup completed successfully.';
+                    signupForm.reset();
+
+                    // 추가 검증을 위해 이 변수가 다른 곳에 정의되어 있다고 가정합니다.
+                    // Assuming you have this variable defined elsewhere for further validation
+                    //isUsernameAvailable = false; 
+                    
+                    // 페이지 이동 완료메세지 확인되면 테스트 
+                    //location.href='/userlist';
+
+                } else {
+                    errorMessageDiv.textContent = result.error || '회원가입에 실패했습니다.\nSignup failed.';
+                }
+
+            } catch (error) {
+                console.error('회원가입 오류/Signup Error:', error);
+                errorMessageDiv.textContent = '서버와 통신 중 오류가 발생했습니다.\nError occurred while communicating with the server.';
+            }
+        });
+    </script>
+</body>
+</html>
