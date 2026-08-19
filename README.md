@@ -19,3 +19,5 @@
 8.nodejs+socketMessage : Nodejs+ReactNative Login,SocketMessage
 
 9.addon : Nodejs + Cpp
+
+10.breavo-smtp : Breavo 메일발송 / Breavo Send email
